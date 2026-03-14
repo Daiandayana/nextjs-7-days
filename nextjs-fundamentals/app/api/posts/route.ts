@@ -3,9 +3,21 @@ import { NextResponse } from "next/server";
 
 const collectionName = process.env.COLLECTION_NAME as string;
 
-export async function GET() {
-  const { db } = await connectToDatabase();
-  const posts = await db.collection(collectionName).find().toArray();
+export async function GET(request: Request) {
+  const {searchParams} = new URL(request.url);
+  const search = searchParams.get("search")?.toLowerCase() || "";
+
+  const {db} = await connectToDatabase();
+
+  let query = {};
+
+  if (search) {
+    query = {
+      title: { $regex: search, $options: "i" }
+    };
+  }
+
+  const posts = await db.collection(collectionName).find(query).toArray();
   return NextResponse.json(posts);
 }
 
