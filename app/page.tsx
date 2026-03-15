@@ -1,16 +1,20 @@
 import CreatePostButton from "./components/CreatePostButton";
 import DisplayPostList from "./components/DisplayPostList";
-import { connectToDatabase } from "./lib/mongodb";
 
 async function checkDatabaseConnection() {
   try {
-    const { db } = await connectToDatabase();
-    await db.command({ ping: 1 });
+    const res = await fetch("http://localhost:3000/api/posts", {
+      method: "HEAD",
+      cache: "no-store",
+    });
 
-    return {
-      success: true,
-      message: "Successfully connected to MongoDB",
-    };
+    if (res.ok) {
+      return {
+        success: true,
+        message: "Successfully connected to MongoDB",
+      };
+    }
+    throw new Error("Failed to connect");
   } catch (error) {
     return {
       success: false,
