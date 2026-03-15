@@ -1,8 +1,15 @@
 import { connectToDatabase } from "@/app/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 const collectionName = process.env.COLLECTION_NAME as string;
+
+const updateSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  author: z.string().min(1, "Author is required"),
+});
 
 export async function GET(
   request: Request,
@@ -28,27 +35,44 @@ export async function PUT(
 ) {
   const { id } = await params;
   const { db } = await connectToDatabase();
-  const body = await request.json();
+  
+  try {
+    const body = await request.json();
+    const validatedData = updateSchema.parse(body);
 
-  const updatePost = {
-    title: body.title,
-    content: body.content,
-    author: body.author,
-    updatedAt: new Date(),
-  };
+    const updatePost = {
+      title: validatedData.title,
+      content: validatedData.content,
+      author: validatedData.author,
+      updatedAt: new Date(),
+    };
 
-  const result = await db
-    .collection(collectionName)
-    .findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { $set: updatePost },
-      { returnDocument: "after" },
+    const result = await db
+      .collection(collectionName)
+      .findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updatePost },
+        { returnDocument: "after" },
+      );
+      
+    if (!result) {
+      return NextResponse.json({ message: "Post not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(result);
+    
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 }
+      );
+    }
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
     );
-  if (!result) {
-    return NextResponse.json({ message: "Post not found" }, { status: 404 });
   }
-
-  return NextResponse.json(result);
 }
 
 export async function DELETE(
