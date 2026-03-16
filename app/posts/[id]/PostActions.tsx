@@ -5,6 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import BackButton from "@/app/components/BackButton";
+import UpdateButton from "@/app/components/UpdateButton";
+import DeleteButton from "@/app/components/DeleteButton";
 
 const updateSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -80,12 +83,7 @@ export default function PostActions({ post }: { post: PostData }) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
-          >
-            ← Back
-          </button>
+          <BackButton onClick={() => router.back()} />
           <span className="text-cyan-400 font-semibold">Edit Mode</span>
         </div>
 
@@ -149,27 +147,11 @@ export default function PostActions({ post }: { post: PostData }) {
 
   return (
     <div className="flex items-center justify-between">
-      <button
-        onClick={() => router.back()}
-        className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
-      >
-        ← Back
-      </button>
+      <BackButton onClick={() => router.back()} />
 
       <div className="flex gap-3">
-        <button
-          onClick={() => setIsEditing(true)}
-          className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-medium rounded-lg transition-colors"
-        >
-          Update
-        </button>
-        <button
-          onClick={deletePost}
-          disabled={isDeleting}
-          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
-        >
-          {isDeleting ? "Deleting..." : "Delete"}
-        </button>
+        <UpdateButton onClick={() => setIsEditing(true)} />
+        <DeleteButton onClick={deletePost} disabled={isDeleting} />
       </div>
     </div>
   );

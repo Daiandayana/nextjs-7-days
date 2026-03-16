@@ -5,6 +5,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useSWR from "swr";
 import { Comment } from "@/app/types/Comment";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "./ThemeProvider";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty"),
@@ -23,6 +26,8 @@ type CommentFormProps = {
 };
 
 export default function CommentSection({ postId }: CommentFormProps) {
+  const { colors } = useTheme();
+  
   const { data: comments, error, isLoading, mutate } = useSWR<Comment[]>(
     `/api/comments?postId=${postId}`,
     fetcher
@@ -38,7 +43,6 @@ export default function CommentSection({ postId }: CommentFormProps) {
   });
 
   const onSubmit = async (data: CommentFormData) => {
-    // Optimistic update - add comment immediately
     const tempComment = {
       _id: "temp-" + Date.now(),
       postId,
@@ -47,7 +51,6 @@ export default function CommentSection({ postId }: CommentFormProps) {
       createdAt: new Date(),
     };
 
-    // Add to UI immediately
     mutate([tempComment, ...(comments || [])], false);
 
     try {
@@ -58,16 +61,12 @@ export default function CommentSection({ postId }: CommentFormProps) {
       });
 
       if (response.ok) {
-        const newComment = await response.json();
-        // Update with real data from server
         mutate();
         reset();
       } else {
-        // Revert on error
         mutate();
       }
     } catch {
-      // Revert on error
       mutate();
     }
   };
@@ -75,7 +74,6 @@ export default function CommentSection({ postId }: CommentFormProps) {
   const deleteComment = async (commentId: string) => {
     if (!confirm("Delete this comment?")) return;
 
-    // Optimistic update
     const previousComments = comments;
     mutate(comments?.filter((c) => c._id !== commentId), false);
 
@@ -92,73 +90,99 @@ export default function CommentSection({ postId }: CommentFormProps) {
   };
 
   return (
-    <div className="mt-8 pt-6 border-t border-cyan-500/30">
-      <h3 className="text-xl font-semibold text-cyan-400 mb-4">Comments</h3>
-
-      {/* Comment Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="mb-6 space-y-3">
-        <div>
-          <input
-            {...register("author")}
-            placeholder="Your name"
-            className="w-full px-4 py-2 bg-[#0d1f3c] border border-cyan-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
-          />
-          {errors.author && (
-            <p className="text-red-400 text-sm mt-1">{errors.author.message}</p>
-          )}
-        </div>
-        <div>
-          <textarea
-            {...register("content")}
-            placeholder="Write a comment..."
-            rows={3}
-            className="w-full px-4 py-2 bg-[#0d1f3c] border border-cyan-500/30 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 resize-none"
-          />
-          {errors.content && (
-            <p className="text-red-400 text-sm mt-1">{errors.content.message}</p>
-          )}
-        </div>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors"
-        >
-          Add Comment
-        </button>
-      </form>
-
-      {/* Comments List */}
-      {isLoading && <p className="text-gray-400">Loading comments...</p>}
+    <Card 
+      className="mt-6"
+      style={{ 
+        backgroundColor: colors.card,
+        borderColor: `${colors.border}50`
+      }}
+    >
+      <CardHeader 
+        className="border-b"
+        style={{ borderColor: `${colors.border}50` }}
+      >
+        <CardTitle style={{ color: colors.accent }}>Comments</CardTitle>
+      </CardHeader>
       
-      {error && <p className="text-red-400">Failed to load comments</p>}
-
-      {!isLoading && !error && comments?.length === 0 && (
-        <p className="text-gray-400">No comments yet. Be the first!</p>
-      )}
-
-      {comments?.map((comment) => (
-        <div
-          key={comment._id}
-          className="bg-[#0d1f3c] p-4 rounded-lg mb-3 border border-cyan-500/20"
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-cyan-400 font-semibold">{comment.author}</p>
-              <p className="text-gray-300 mt-1">{comment.content}</p>
-              <p className="text-gray-500 text-sm mt-2">
-                {new Date(comment.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-            {!comment._id.startsWith("temp-") && (
-              <button
-                onClick={() => deleteComment(comment._id)}
-                className="text-red-400 hover:text-red-300 text-sm"
-              >
-                Delete
-              </button>
+      <CardContent className="pt-6">
+        {/* Comment Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mb-6">
+          <div>
+            <input
+              {...register("author")}
+              placeholder="Your name"
+              className="w-full px-4 py-2 rounded-lg border text-white placeholder-gray-500 focus:outline-none"
+              style={{
+                backgroundColor: colors.bg,
+                borderColor: `${colors.border}50`,
+              }}
+            />
+            {errors.author && (
+              <p className="text-red-400 text-sm mt-1">{errors.author.message}</p>
             )}
           </div>
-        </div>
-      ))}
-    </div>
+          <div>
+            <textarea
+              {...register("content")}
+              placeholder="Write a comment..."
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border text-white placeholder-gray-500 focus:outline-none resize-none"
+              style={{
+                backgroundColor: colors.bg,
+                borderColor: `${colors.border}50`,
+              }}
+            />
+            {errors.content && (
+              <p className="text-red-400 text-sm mt-1">{errors.content.message}</p>
+            )}
+          </div>
+          <Button 
+            type="submit" 
+            style={{ 
+              backgroundColor: colors.accent,
+              color: colors.bg
+            }}
+          >
+            Add Comment
+          </Button>
+        </form>
+
+        {/* Comments List */}
+        {isLoading && <p style={{ color: colors.textMuted }}>Loading comments...</p>}
+        {error && <p className="text-red-400">Failed to load comments</p>}
+        {!isLoading && !error && comments?.length === 0 && (
+          <p style={{ color: colors.textMuted }}>No comments yet. Be the first!</p>
+        )}
+
+        {comments?.map((comment) => (
+          <div
+            key={comment._id}
+            className="p-4 rounded-lg mb-3 border"
+            style={{
+              backgroundColor: colors.bg,
+              borderColor: `${colors.border}30`,
+            }}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <p style={{ color: colors.accent, fontWeight: 600 }}>{comment.author}</p>
+                <p style={{ color: colors.text }} className="mt-1">{comment.content}</p>
+                <p style={{ color: colors.textMuted }} className="text-sm mt-2">
+                  {new Date(comment.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+              {!comment._id.startsWith("temp-") && (
+                <button
+                  onClick={() => deleteComment(comment._id)}
+                  className="text-red-400 hover:text-red-300 text-sm"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }
