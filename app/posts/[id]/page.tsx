@@ -1,6 +1,7 @@
 import { connectToDatabase } from "@/app/lib/mongodb";
 import { ObjectId } from "mongodb";
 import PostActions from "./PostActions";
+import CommentSection from "@/app/components/CommentSection";
 import { Post } from "@/app/types/Post";
 
 const collectionName = process.env.COLLECTION_NAME as string;
@@ -62,6 +63,9 @@ export default async function PostDetail({
           </div>
           
         </div>
+
+        {/* Comment Section */}
+        <CommentSection postId={post._id.toString()} />
 
       </div>
     </div>
