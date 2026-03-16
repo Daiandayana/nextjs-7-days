@@ -57,11 +57,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("theme", newTheme);
   };
 
-  const colors = themeColors[theme];
-
-  if (!mounted) {
-    return <>{children}</>;
-  }
+  // Default colors for SSR
+  const defaultColors = themeColors.dark;
+  const colors = mounted ? themeColors[theme] : defaultColors;
 
   return (
     <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>
@@ -69,7 +67,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         style={{
           backgroundColor: colors.bg,
           minHeight: "100vh",
-          transition: "background-color 0.3s ease",
+          transition: mounted ? "background-color 0.3s ease" : "none",
           color: colors.text,
         }}
       >

@@ -4,10 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useSWR from "swr";
-import { Comment } from "@/app/types/Comment";
+import { Comment } from "@/types/Comment";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "./ThemeProvider";
+import { useTheme } from "../shared/ThemeProvider";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty"),

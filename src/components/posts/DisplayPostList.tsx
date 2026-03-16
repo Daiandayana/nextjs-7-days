@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
-import { Post } from "@/app/types/Post";
-import { useTheme } from "./ThemeProvider";
+import { Post } from "@/types/Post";
+import { useTheme } from "../shared/ThemeProvider";
 
 const fetcher = (url: string) => fetch(url).then((res) => {
   if (!res.ok) throw new Error("Failed to fetch");

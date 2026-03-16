@@ -1,4 +1,4 @@
-import HomeContent from "./components/HomeContent";
+import HomeContent from "@/components/HomeContent";
 
 async function checkDatabaseConnection() {
   try {

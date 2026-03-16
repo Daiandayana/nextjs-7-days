@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
-import BackButton from "@/app/components/BackButton";
-import UpdateButton from "@/app/components/UpdateButton";
-import DeleteButton from "@/app/components/DeleteButton";
+import BackButton from "@/components/shared/BackButton";
+import UpdateButton from "@/components/shared/UpdateButton";
+import DeleteButton from "@/components/shared/DeleteButton";
 
 const updateSchema = z.object({
   title: z.string().min(1, "Title is required"),

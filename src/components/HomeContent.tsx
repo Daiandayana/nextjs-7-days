@@ -1,9 +1,9 @@
 "use client";
 
 import CreatePostButton from "./CreatePostButton";
-import DisplayPostList from "./DisplayPostList";
-import ThemeToggleButton from "./ThemeToggleButton";
-import { useTheme } from "./ThemeProvider";
+import DisplayPostList from "./posts/DisplayPostList";
+import ThemeToggleButton from "./shared/ThemeToggleButton";
+import { useTheme } from "./shared/ThemeProvider";
 
 interface DbStatus {
   success: boolean;

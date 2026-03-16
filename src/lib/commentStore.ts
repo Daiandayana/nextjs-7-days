@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Comment } from "@/app/types/Comment";
+import { Comment } from "@/types/Comment";
 
 interface CommentStore {
   comments: Comment[];

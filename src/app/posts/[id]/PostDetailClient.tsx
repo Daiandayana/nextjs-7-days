@@ -1,14 +1,23 @@
 "use client";
 
-import { useTheme } from "@/app/components/ThemeProvider";
+import { useTheme } from "@/components/shared/ThemeProvider";
 import PostActions from "./PostActions";
-import CommentSection from "@/app/components/CommentSection";
-import ThemeToggleButton from "@/app/components/ThemeToggleButton";
-import { Post } from "@/app/types/Post";
+import CommentSection from "@/components/posts/CommentSection";
+import ThemeToggleButton from "@/components/shared/ThemeToggleButton";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 
+// Define the serialized post type (strings instead of ObjectId/Date)
+interface SerializedPost {
+  _id: string;
+  title: string;
+  content: string;
+  author: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface PostDetailProps {
-  post: Post;
+  post: SerializedPost;
 }
 
 export default function PostDetailClient({ post }: PostDetailProps) {
@@ -37,12 +46,12 @@ export default function PostDetailClient({ post }: PostDetailProps) {
           >
             <PostActions
               post={{
-                _id: post._id.toString(),
+                _id: post._id,
                 title: post.title,
                 content: post.content,
                 author: post.author,
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt,
+                createdAt: new Date(post.createdAt),
+                updatedAt: new Date(post.updatedAt),
               }}
             />
           </CardHeader>
@@ -83,7 +92,7 @@ export default function PostDetailClient({ post }: PostDetailProps) {
         </Card>
 
         {/* Comment Section */}
-        <CommentSection postId={post._id.toString()} />
+        <CommentSection postId={post._id} />
 
       </div>
     </div>

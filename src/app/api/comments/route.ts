@@ -1,4 +1,4 @@
-import { connectToDatabase } from "@/app/lib/mongodb";
+import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
