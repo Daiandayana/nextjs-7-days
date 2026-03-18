@@ -1,9 +1,20 @@
 "use client";
 
 import CreatePostButton from "./CreatePostButton";
-import DisplayPostList from "./posts/DisplayPostList";
 import ThemeToggleButton from "./shared/ThemeToggleButton";
 import { useTheme } from "./shared/ThemeProvider";
+import dynamic from "next/dynamic";
+
+// Lazy load DisplayPostList with skeleton loading
+const DisplayPostList = dynamic(
+  () => import("./posts/DisplayPostList"),
+  {
+    loading: () => {
+      const Skeleton = require("./posts/PostListSkeleton").default;
+      return <Skeleton />;
+    }
+  }
+);
 
 interface DbStatus {
   success: boolean;

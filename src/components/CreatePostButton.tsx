@@ -9,6 +9,7 @@ const postSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
+  image: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
 type PostFormData = z.infer<typeof postSchema>;
@@ -107,6 +108,18 @@ export default function CreatePostButton() {
             />
             {errors.author && (
               <p className="text-red-400 text-sm mt-1">{errors.author.message}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              {...register("image")}
+              type="url"
+              placeholder="Image URL (optional)"
+              className="w-full px-3 py-2 bg-[#1e3a5f] border border-gray-600 rounded text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400"
+            />
+            {errors.image && (
+              <p className="text-red-400 text-sm mt-1">{errors.image.message}</p>
             )}
           </div>
 

@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import useSWR from "swr";
 import { Post } from "@/types/Post";
 import { useTheme } from "../shared/ThemeProvider";
+import PostListSkeleton from "./PostListSkeleton";
 
-const fetcher = (url: string) => fetch(url).then((res) => {
-  if (!res.ok) throw new Error("Failed to fetch");
-  return res.json();
-});
+const fetcher = (url: string) =>
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json();
+  });
 
 export default function DisplayPostList() {
   const [search, setSearch] = useState("");
@@ -21,12 +24,16 @@ export default function DisplayPostList() {
     return () => clearTimeout(timer);
   }, [search]);
 
-  const query = debouncedSearch ? `?search=${encodeURIComponent(debouncedSearch)}` : "";
-  const { data: posts, error, isLoading } = useSWR<Post[]>(
-    `/api/posts${query}`, 
-    fetcher,
-    { revalidateOnFocus: false }
-  );
+  const query = debouncedSearch
+    ? `?search=${encodeURIComponent(debouncedSearch)}`
+    : "";
+  const {
+    data: posts,
+    error,
+    isLoading,
+  } = useSWR<Post[]>(`/api/posts${query}`, fetcher, {
+    revalidateOnFocus: false,
+  });
 
   return (
     <div>
@@ -42,11 +49,15 @@ export default function DisplayPostList() {
         }}
       />
 
-      {isLoading && <p className="text-center p-4" style={{ color: colors.textMuted }}>Loading posts...</p>}
-      {error && <p className="text-center p-4 text-red-400">Error: {error.message}</p>}
+      {isLoading && <PostListSkeleton />}
+      {error && (
+        <p className="text-center p-4 text-red-400">Error: {error.message}</p>
+      )}
       {!isLoading && !error && (!posts || posts.length === 0) && (
         <p className="text-center p-4" style={{ color: colors.textMuted }}>
-          {debouncedSearch ? "No posts found matching your search." : "No posts yet. Create one!"}
+          {debouncedSearch
+            ? "No posts found matching your search."
+            : "No posts yet. Create one!"}
         </p>
       )}
 
@@ -69,8 +80,26 @@ export default function DisplayPostList() {
               e.currentTarget.style.backgroundColor = colors.card;
             }}
           >
-            <h3 className="text-lg font-semibold" style={{ color: colors.accent }}>{post.title}</h3>
-            <p className="text-sm mt-1" style={{ color: colors.textMuted }}>By {post.author}</p>
+            {post.image && (
+              <div className="relative w-full h-32 mb-3 rounded-lg overflow-hidden">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+            )}
+            <h3
+              className="text-lg font-semibold"
+              style={{ color: colors.accent }}
+            >
+              {post.title}
+            </h3>
+            <p className="text-sm mt-1" style={{ color: colors.textMuted }}>
+              By {post.author}
+            </p>
           </Link>
         ))}
       </div>

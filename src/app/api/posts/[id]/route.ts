@@ -9,6 +9,7 @@ const updateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
+  image: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
 export async function GET(
@@ -44,6 +45,7 @@ export async function PUT(
       title: validatedData.title,
       content: validatedData.content,
       author: validatedData.author,
+      image: validatedData.image || undefined,
       updatedAt: new Date(),
     };
 

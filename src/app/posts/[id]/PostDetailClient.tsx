@@ -2,9 +2,33 @@
 
 import { useTheme } from "@/components/shared/ThemeProvider";
 import PostActions from "./PostActions";
-import CommentSection from "@/components/posts/CommentSection";
 import ThemeToggleButton from "@/components/shared/ThemeToggleButton";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+
+// Lazy load PostStats component with loading skeleton
+const PostStats = dynamic(
+  () => import("@/components/posts/PostStats"),
+  {
+    loading: () => {
+      const Skeleton = require("@/components/posts/PostStatsSkeleton").default;
+      return <Skeleton />;
+    },
+    ssr: false // Disable SSR for stats (client-only interactive component)
+  }
+);
+
+// Lazy load CommentSection with loading skeleton
+const CommentSection = dynamic(
+  () => import("@/components/posts/CommentSection"),
+  {
+    loading: () => {
+      const Skeleton = require("@/components/posts/CommentSkeleton").default;
+      return <Skeleton />;
+    }
+  }
+);
 
 // Define the serialized post type (strings instead of ObjectId/Date)
 interface SerializedPost {
@@ -12,6 +36,7 @@ interface SerializedPost {
   title: string;
   content: string;
   author: string;
+  image?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -50,6 +75,7 @@ export default function PostDetailClient({ post }: PostDetailProps) {
                 title: post.title,
                 content: post.content,
                 author: post.author,
+                image: post.image,
                 createdAt: new Date(post.createdAt),
                 updatedAt: new Date(post.updatedAt),
               }}
@@ -63,6 +89,18 @@ export default function PostDetailClient({ post }: PostDetailProps) {
             >
               {post.title}
             </CardTitle>
+            
+            {post.image && (
+              <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                />
+              </div>
+            )}
             
             <CardDescription 
               className="mb-4"
@@ -90,6 +128,13 @@ export default function PostDetailClient({ post }: PostDetailProps) {
             </div>
           </CardContent>
         </Card>
+
+        {/* Lazy-loaded Post Statistics - loads after initial page render */}
+        <PostStats 
+          postId={post._id} 
+          viewCount={Math.floor(Math.random() * 500) + 100} 
+          commentCount={0} // Will be updated via props in real implementation
+        />
 
         {/* Comment Section */}
         <CommentSection postId={post._id} />

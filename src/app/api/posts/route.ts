@@ -15,12 +15,12 @@ export async function GET(request: Request) {
   const search = searchParams.get("search");
 
   const { db } = await connectToDatabase();
-  
+
   let query = {};
   if (search) {
     query = { title: { $regex: search, $options: "i" } };
   }
-  
+
   const posts = await db.collection(collectionName).find(query).toArray();
   return NextResponse.json(posts);
 }
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   }
 
   const { db } = await connectToDatabase();
-  
+
   try {
     const body = await request.json();
     const validatedData = postSchema.parse(body);
@@ -45,18 +45,20 @@ export async function POST(request: Request) {
     };
 
     const result = await db.collection(collectionName).insertOne(newPost);
-    return NextResponse.json({ ...newPost, _id: result.insertedId }, { status: 201 });
-    
+    return NextResponse.json(
+      { ...newPost, _id: result.insertedId },
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors[0].message },
-        { status: 400 }
+        { status: 400 },
       );
     }
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
