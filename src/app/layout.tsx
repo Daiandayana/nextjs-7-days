@@ -3,6 +3,8 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { SessionProvider } from "@/components/shared/SessionProvider";
+import { I18nProvider } from "@/lib/i18n";
 import WebVitals from "@/components/shared/WebVitals";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -24,19 +26,23 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ minHeight: "100vh" }}
       >
-        <ThemeProvider>
-          <WebVitals />
-          {children}
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <SessionProvider>
+              <WebVitals />
+              {children}
+            </SessionProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </body>
     </html>
   );

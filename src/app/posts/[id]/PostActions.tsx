@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/lib/hooks/useAuth";
 import BackButton from "@/components/shared/BackButton";
 import UpdateButton from "@/components/shared/UpdateButton";
 import DeleteButton from "@/components/shared/DeleteButton";
@@ -30,6 +31,7 @@ type PostData = {
 
 export default function PostActions({ post }: { post: PostData }) {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -165,10 +167,12 @@ export default function PostActions({ post }: { post: PostData }) {
     <div className="flex items-center justify-between">
       <BackButton onClick={() => router.back()} />
 
-      <div className="flex gap-3">
-        <UpdateButton onClick={() => setIsEditing(true)} />
-        <DeleteButton onClick={deletePost} disabled={isDeleting} />
-      </div>
+      {isAuthenticated && (
+        <div className="flex gap-3">
+          <UpdateButton onClick={() => setIsEditing(true)} />
+          <DeleteButton onClick={deletePost} disabled={isDeleting} />
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,10 @@
 
 import CreatePostButton from "./CreatePostButton";
 import ThemeToggleButton from "./shared/ThemeToggleButton";
+import LogoutButton from "./shared/LogoutButton";
+import LanguageSwitcher from "./shared/LanguageSwitcher";
 import { useTheme } from "./shared/ThemeProvider";
+import { useI18n } from "@/lib/i18n";
 import dynamic from "next/dynamic";
 
 // Lazy load DisplayPostList with skeleton loading
@@ -23,16 +26,19 @@ interface DbStatus {
 
 export default function HomeContent({ dbStatus }: { dbStatus: DbStatus }) {
   const { colors } = useTheme();
+  const { t } = useI18n();
 
   return (
     <div className="min-h-screen p-8">
       {/* Header with Toggle */}
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end items-center gap-3 mb-4">
+        <LanguageSwitcher />
+        <LogoutButton />
         <ThemeToggleButton />
       </div>
 
       <h1 className="text-3xl font-bold text-center mb-8" style={{ color: colors.accent }}>
-        My Blog
+        {t("HomePage.title")}
       </h1>
 
       <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
