@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import useSWR from "swr";
+import { useAuth } from "@/lib/hooks/useAuth";
 import { Comment } from "@/types/Comment";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,7 @@ type CommentFormProps = {
 
 export default function CommentSection({ postId }: CommentFormProps) {
   const { colors } = useTheme();
+  const { isAuthenticated } = useAuth();
   
   const { data: comments, error, isLoading, mutate } = useSWR<Comment[]>(
     `/api/comments?postId=${postId}`,
@@ -172,7 +174,7 @@ export default function CommentSection({ postId }: CommentFormProps) {
                   {new Date(comment.createdAt).toLocaleDateString()}
                 </p>
               </div>
-              {!comment._id.startsWith("temp-") && (
+              {isAuthenticated && !comment._id.startsWith("temp-") && (
                 <button
                   onClick={() => deleteComment(comment._id)}
                   className="text-red-400 hover:text-red-300 text-sm"
