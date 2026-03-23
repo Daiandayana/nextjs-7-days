@@ -8,6 +8,7 @@ import { Comment } from "@/types/Comment";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "../shared/ThemeProvider";
+import CommentSkeleton from "./CommentSkeleton";
 
 const commentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty"),
@@ -148,7 +149,7 @@ export default function CommentSection({ postId }: CommentFormProps) {
         </form>
 
         {/* Comments List */}
-        {isLoading && <p style={{ color: colors.textMuted }}>Loading comments...</p>}
+        {isLoading && <CommentSkeleton />}
         {error && <p className="text-red-400">Failed to load comments</p>}
         {!isLoading && !error && comments?.length === 0 && (
           <p style={{ color: colors.textMuted }}>No comments yet. Be the first!</p>

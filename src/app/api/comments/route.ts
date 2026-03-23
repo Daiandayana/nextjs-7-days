@@ -2,6 +2,8 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const collectionName = process.env.COMMENTS_COLLECTION as string || "comments";
 
 const commentSchema = z.object({

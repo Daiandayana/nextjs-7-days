@@ -13,6 +13,7 @@ const updateSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
+  image: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
 type UpdateFormData = z.infer<typeof updateSchema>;
@@ -22,6 +23,7 @@ type PostData = {
   title: string;
   content: string;
   author: string;
+  image?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -42,6 +44,7 @@ export default function PostActions({ post }: { post: PostData }) {
       title: post.title,
       content: post.content,
       author: post.author,
+      image: post.image || "",
     },
   });
 
@@ -119,6 +122,19 @@ export default function PostActions({ post }: { post: PostData }) {
             />
             {errors.author && (
               <p className="text-red-400 text-sm mt-1">{errors.author.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-gray-400 text-sm mb-1">Image URL</label>
+            <input
+              {...register("image")}
+              type="url"
+              placeholder="https://example.com/image.jpg"
+              className="w-full px-3 py-2 bg-[#1e3a5f] border border-gray-600 rounded text-white focus:outline-none focus:border-cyan-400"
+            />
+            {errors.image && (
+              <p className="text-red-400 text-sm mt-1">{errors.image.message}</p>
             )}
           </div>
 
