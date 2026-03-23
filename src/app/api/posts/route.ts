@@ -2,12 +2,15 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const collectionName = process.env.COLLECTION_NAME as string;
 
 const postSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
   author: z.string().min(1, "Author is required"),
+  image: z.string().url("Invalid image URL").optional().or(z.literal("")),
 });
 
 export async function GET(request: Request) {
@@ -40,6 +43,7 @@ export async function POST(request: Request) {
       title: validatedData.title,
       content: validatedData.content,
       author: validatedData.author,
+      image: validatedData.image || undefined,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

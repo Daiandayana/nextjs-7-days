@@ -1,4 +1,8 @@
 import HomeContent from "@/components/HomeContent";
+import { Suspense } from "react";
+import HomePageSkeleton from "@/components/HomePageSkeleton";
+
+export const revalidate = 60;
 
 async function checkDatabaseConnection() {
   try {
@@ -24,8 +28,15 @@ async function checkDatabaseConnection() {
   }
 }
 
-export default async function HomePage() {
+async function DatabaseStatus() {
   const dbStatus = await checkDatabaseConnection();
-
   return <HomeContent dbStatus={dbStatus} />;
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<HomePageSkeleton />}>
+      <DatabaseStatus />
+    </Suspense>
+  );
 }

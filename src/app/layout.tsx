@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import WebVitals from "@/components/shared/WebVitals";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -30,8 +31,10 @@ export default function RootLayout({
     <html lang="en" className={cn("font-sans", inter.variable)}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ minHeight: "100vh" }}
       >
         <ThemeProvider>
+          <WebVitals />
           {children}
         </ThemeProvider>
       </body>

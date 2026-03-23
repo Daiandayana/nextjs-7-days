@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+export const dynamic = "force-dynamic";
+
 const collectionName = process.env.COLLECTION_NAME as string;
 
 const updateSchema = z.object({

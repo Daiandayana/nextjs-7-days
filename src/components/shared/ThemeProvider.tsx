@@ -57,22 +57,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("theme", newTheme);
   };
 
-  // Default colors for SSR
-  const defaultColors = themeColors.dark;
-  const colors = mounted ? themeColors[theme] : defaultColors;
-
+  // Return children without wrapper div to avoid hydration mismatch
+  // Components using useTheme() handle their own styling
   return (
-    <ThemeContext.Provider value={{ theme, colors, toggleTheme }}>
-      <div
-        style={{
-          backgroundColor: colors.bg,
-          minHeight: "100vh",
-          transition: mounted ? "background-color 0.3s ease" : "none",
-          color: colors.text,
-        }}
-      >
-        {children}
-      </div>
+    <ThemeContext.Provider value={{ theme, colors: themeColors[theme], toggleTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 }
