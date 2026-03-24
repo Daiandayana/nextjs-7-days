@@ -1,4 +1,4 @@
-import { ObjectId, Db } from "mongodb";
+import { ObjectId } from "mongodb";
 import { connectToDatabase } from "./mongodb";
 
 const USERS_COLLECTION = "users";
@@ -12,7 +12,6 @@ export async function findUserByEmail(email: string) {
   
   if (!user) return null;
   
-  // Convert MongoDB _id to string
   return {
     _id: user._id?.toString() || '',
     email: user.email,
@@ -55,38 +54,12 @@ export async function createUser(data: {
   email: string;
   password: string;
   name: string;
-}): Promise<User> {
-  const { db } = await connectToDatabase();
-  
-  const newUser = {
-    email: data.email,
-    password: data.password, // In production, this should be hashed!
-    name: data.name,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-  
-  const result = await db.collection(USERS_COLLECTION).insertOne(newUser);
-  
-  return {
-    ...newUser,
-    _id: result.insertedId.toString(),
-  };
-}
-
-/**
- * Create a new user
- */
-export async function createUser(data: {
-  email: string;
-  password: string;
-  name: string;
 }) {
   const { db } = await connectToDatabase();
   
   const newUser = {
     email: data.email,
-    password: data.password, // In production, this should be hashed!
+    password: data.password,
     name: data.name,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -107,10 +80,7 @@ export async function createUser(data: {
 /**
  * Update user password
  */
-export async function updateUserPassword(
-  id: string,
-  newPassword: string
-): Promise<boolean> {
+export async function updateUserPassword(id: string, newPassword: string): Promise<boolean> {
   const { db } = await connectToDatabase();
   
   try {
@@ -119,7 +89,7 @@ export async function updateUserPassword(
       { _id: objectId },
       { 
         $set: { 
-          password: newPassword, // In production, hash this!
+          password: newPassword,
           updatedAt: new Date() 
         } 
       }
@@ -137,20 +107,12 @@ export async function updateUserPassword(
 export async function seedDemoUsers(): Promise<number> {
   const existingUsers = await findUserByEmail("syah@example.com");
   if (existingUsers) {
-    return 0; // Already seeded
+    return 0;
   }
 
   const demoUsers = [
-    {
-      email: "syah@example.com",
-      password: "123456",
-      name: "Syah",
-    },
-    {
-      email: "admin@example.com",
-      password: "admin123",
-      name: "Admin",
-    },
+    { email: "syah@example.com", password: "123456", name: "Syah" },
+    { email: "admin@example.com", password: "admin123", name: "Admin" },
   ];
 
   const { db } = await connectToDatabase();
