@@ -1,40 +1,47 @@
-import { ObjectId, Filter } from "mongodb";
+import { ObjectId, Db } from "mongodb";
 import { connectToDatabase } from "./mongodb";
-import type { User } from "@/types/User";
 
 const USERS_COLLECTION = "users";
 
 /**
  * Find a user by email
  */
-export async function findUserByEmail(email: string): Promise<User | null> {
+export async function findUserByEmail(email: string) {
   const { db } = await connectToDatabase();
-  const user = await db.collection<User>(USERS_COLLECTION).findOne({ email } as Filter<User>);
+  const user = await db.collection(USERS_COLLECTION).findOne({ email });
   
   if (!user) return null;
   
   // Convert MongoDB _id to string
   return {
-    ...user,
-    _id: user._id.toString(),
+    _id: user._id?.toString() || '',
+    email: user.email,
+    password: user.password,
+    name: user.name,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 }
 
 /**
  * Find a user by ID
  */
-export async function findUserById(id: string): Promise<User | null> {
+export async function findUserById(id: string) {
   const { db } = await connectToDatabase();
   
   try {
     const objectId = new ObjectId(id);
-    const user = await db.collection<User>(USERS_COLLECTION).findOne({ _id: objectId } as Filter<User>);
+    const user = await db.collection(USERS_COLLECTION).findOne({ _id: objectId });
     
     if (!user) return null;
     
     return {
-      ...user,
-      _id: user._id.toString(),
+      _id: user._id?.toString() || '',
+      email: user.email,
+      password: user.password,
+      name: user.name,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   } catch {
     return null;
@@ -68,6 +75,36 @@ export async function createUser(data: {
 }
 
 /**
+ * Create a new user
+ */
+export async function createUser(data: {
+  email: string;
+  password: string;
+  name: string;
+}) {
+  const { db } = await connectToDatabase();
+  
+  const newUser = {
+    email: data.email,
+    password: data.password, // In production, this should be hashed!
+    name: data.name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+  
+  const result = await db.collection(USERS_COLLECTION).insertOne(newUser);
+  
+  return {
+    _id: result.insertedId.toString(),
+    email: data.email,
+    password: data.password,
+    name: data.name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+}
+
+/**
  * Update user password
  */
 export async function updateUserPassword(
@@ -79,7 +116,7 @@ export async function updateUserPassword(
   try {
     const objectId = new ObjectId(id);
     const result = await db.collection(USERS_COLLECTION).updateOne(
-      { _id: objectId } as Filter<User>,
+      { _id: objectId },
       { 
         $set: { 
           password: newPassword, // In production, hash this!

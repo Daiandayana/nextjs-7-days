@@ -2,7 +2,6 @@ import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
 import { findUserByEmail } from "./users";
-import type { User } from "@/types/User";
 
 export const {
   handlers,
@@ -23,7 +22,7 @@ export const {
         }
 
         // Find user in MongoDB users collection
-        const user = await findUserByEmail(credentials.email as string) as User | null;
+        const user = await findUserByEmail(credentials.email as string);
 
         if (!user) {
           return null;
@@ -36,7 +35,7 @@ export const {
 
         // Return user without password
         return {
-          id: user._id?.toString() || user.id,
+          id: user._id,
           name: user.name,
           email: user.email,
         };
