@@ -1,40 +1,46 @@
 import { ObjectId } from "mongodb";
 import { connectToDatabase } from "./mongodb";
-import type { User } from "@/types/User";
 
 const USERS_COLLECTION = "users";
 
 /**
  * Find a user by email
  */
-export async function findUserByEmail(email: string): Promise<User | null> {
+export async function findUserByEmail(email: string) {
   const { db } = await connectToDatabase();
-  const user = await db.collection<User>(USERS_COLLECTION).findOne({ email });
+  const user: any = await db.collection(USERS_COLLECTION).findOne({ email });
   
   if (!user) return null;
   
-  // Convert MongoDB _id to string
   return {
-    ...user,
-    _id: user._id.toString(),
+    _id: String(user._id),
+    email: user.email,
+    password: user.password,
+    name: user.name,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
   };
 }
 
 /**
  * Find a user by ID
  */
-export async function findUserById(id: string): Promise<User | null> {
+export async function findUserById(id: string) {
   const { db } = await connectToDatabase();
   
   try {
     const objectId = new ObjectId(id);
-    const user = await db.collection<User>(USERS_COLLECTION).findOne({ _id: objectId });
+    const user: any = await db.collection(USERS_COLLECTION).findOne({ _id: objectId });
     
     if (!user) return null;
     
     return {
-      ...user,
-      _id: user._id.toString(),
+      _id: String(user._id),
+      email: user.email,
+      password: user.password,
+      name: user.name,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     };
   } catch {
     return null;
@@ -44,16 +50,12 @@ export async function findUserById(id: string): Promise<User | null> {
 /**
  * Create a new user
  */
-export async function createUser(data: {
-  email: string;
-  password: string;
-  name: string;
-}): Promise<User> {
+export async function createUser(data: { email: string; password: string; name: string }) {
   const { db } = await connectToDatabase();
   
   const newUser = {
     email: data.email,
-    password: data.password, // In production, this should be hashed!
+    password: data.password,
     name: data.name,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -62,30 +64,26 @@ export async function createUser(data: {
   const result = await db.collection(USERS_COLLECTION).insertOne(newUser);
   
   return {
-    ...newUser,
-    _id: result.insertedId.toString(),
+    _id: String(result.insertedId),
+    email: data.email,
+    password: data.password,
+    name: data.name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 }
 
 /**
  * Update user password
  */
-export async function updateUserPassword(
-  id: string,
-  newPassword: string
-): Promise<boolean> {
+export async function updateUserPassword(id: string, newPassword: string): Promise<boolean> {
   const { db } = await connectToDatabase();
   
   try {
     const objectId = new ObjectId(id);
     const result = await db.collection(USERS_COLLECTION).updateOne(
       { _id: objectId },
-      { 
-        $set: { 
-          password: newPassword, // In production, hash this!
-          updatedAt: new Date() 
-        } 
-      }
+      { $set: { password: newPassword, updatedAt: new Date() } }
     );
     
     return result.modifiedCount > 0;
@@ -99,21 +97,11 @@ export async function updateUserPassword(
  */
 export async function seedDemoUsers(): Promise<number> {
   const existingUsers = await findUserByEmail("syah@example.com");
-  if (existingUsers) {
-    return 0; // Already seeded
-  }
+  if (existingUsers) return 0;
 
   const demoUsers = [
-    {
-      email: "syah@example.com",
-      password: "123456",
-      name: "Syah",
-    },
-    {
-      email: "admin@example.com",
-      password: "admin123",
-      name: "Admin",
-    },
+    { email: "syah@example.com", password: "123456", name: "Syah" },
+    { email: "admin@example.com", password: "admin123", name: "Admin" },
   ];
 
   const { db } = await connectToDatabase();
