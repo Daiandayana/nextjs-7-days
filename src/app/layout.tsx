@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/shared/ThemeProvider";
 import { SessionProvider } from "@/components/shared/SessionProvider";
 import { I18nProvider } from "@/lib/i18n";
 import WebVitals from "@/components/shared/WebVitals";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
@@ -39,6 +40,7 @@ export default function RootLayout({
           <ThemeProvider>
             <SessionProvider>
               <WebVitals />
+              <Analytics />
               {children}
             </SessionProvider>
           </ThemeProvider>
