@@ -1,23 +1,17 @@
 import HomeContent from "@/components/HomeContent";
 import { Suspense } from "react";
 import HomePageSkeleton from "@/components/HomePageSkeleton";
+import { connectToDatabase } from "@/lib/mongodb";
 
 export const revalidate = 60;
 
 async function checkDatabaseConnection() {
   try {
-    const res = await fetch("http://localhost:3000/api/posts", {
-      method: "HEAD",
-      cache: "no-store",
-    });
-
-    if (res.ok) {
-      return {
-        success: true,
-        message: "Successfully connected to MongoDB",
-      };
-    }
-    throw new Error("Failed to connect");
+    await connectToDatabase();
+    return {
+      success: true,
+      message: "Successfully connected to MongoDB",
+    };
   } catch (error) {
     return {
       success: false,

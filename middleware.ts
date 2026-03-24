@@ -3,7 +3,6 @@ import type { NextRequest } from 'next/server';
 
 // Public routes (no auth needed)
 const publicRoutes = [
-  '/',
   '/login',
   '/api/auth',
   '/api/vitals',
@@ -25,7 +24,33 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check if this is a public route
+  // Homepage requires authentication (redirect to login if not authenticated)
+  if (pathname === '/') {
+    // Check for various possible auth cookies (NextAuth v5)
+    const possibleCookies = [
+      'authjs.session-token',
+      '__Secure-authjs.session-token', 
+      'next-auth.session-token',
+      '__Host-authjs.session-token'
+    ];
+    
+    let hasToken = false;
+    for (const cookieName of possibleCookies) {
+      if (request.cookies.get(cookieName)) {
+        hasToken = true;
+        break;
+      }
+    }
+    
+    if (!hasToken) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return NextResponse.next();
+  }
+
+  // Check if this is a public route (not homepage)
   const isPublicRoute = publicRoutes.some(route => 
     pathname === route || pathname.startsWith(route)
   );
@@ -59,6 +84,7 @@ export function middleware(request: NextRequest) {
 // Configure which routes the middleware runs on
 export const config = {
   matcher: [
-    '/:path*',
+    '/',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

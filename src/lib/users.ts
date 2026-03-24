@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId, Filter } from "mongodb";
 import { connectToDatabase } from "./mongodb";
 import type { User } from "@/types/User";
 
@@ -9,7 +9,7 @@ const USERS_COLLECTION = "users";
  */
 export async function findUserByEmail(email: string): Promise<User | null> {
   const { db } = await connectToDatabase();
-  const user = await db.collection<User>(USERS_COLLECTION).findOne({ email });
+  const user = await db.collection<User>(USERS_COLLECTION).findOne({ email } as Filter<User>);
   
   if (!user) return null;
   
@@ -28,7 +28,7 @@ export async function findUserById(id: string): Promise<User | null> {
   
   try {
     const objectId = new ObjectId(id);
-    const user = await db.collection<User>(USERS_COLLECTION).findOne({ _id: objectId });
+    const user = await db.collection<User>(USERS_COLLECTION).findOne({ _id: objectId } as Filter<User>);
     
     if (!user) return null;
     
@@ -79,7 +79,7 @@ export async function updateUserPassword(
   try {
     const objectId = new ObjectId(id);
     const result = await db.collection(USERS_COLLECTION).updateOne(
-      { _id: objectId },
+      { _id: objectId } as Filter<User>,
       { 
         $set: { 
           password: newPassword, // In production, hash this!

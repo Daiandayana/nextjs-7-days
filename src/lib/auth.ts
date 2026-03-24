@@ -1,22 +1,8 @@
 import NextAuth from "next-auth";
 import { authConfig } from "./auth.config";
 import Credentials from "next-auth/providers/credentials";
-
-// Hardcoded demo users
-const DEMO_USERS = [
-  {
-    id: "1",
-    name: "Syah",
-    email: "syah@example.com",
-    password: "123456",
-  },
-  {
-    id: "2",
-    name: "Admin User",
-    email: "admin@example.com",
-    password: "admin123",
-  },
-];
+import { findUserByEmail } from "./users";
+import type { User } from "@/types/User";
 
 export const {
   handlers,
@@ -36,19 +22,21 @@ export const {
           return null;
         }
 
-        // Find user in demo users
-        const user = DEMO_USERS.find(
-          (u) =>
-            u.email === credentials.email && u.password === credentials.password
-        );
+        // Find user in MongoDB users collection
+        const user = await findUserByEmail(credentials.email as string) as User | null;
 
         if (!user) {
           return null;
         }
 
+        // Check password (plaintext comparison - in production should use bcrypt)
+        if (user.password !== credentials.password) {
+          return null;
+        }
+
         // Return user without password
         return {
-          id: user.id,
+          id: user._id?.toString() || user.id,
           name: user.name,
           email: user.email,
         };

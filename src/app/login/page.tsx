@@ -106,7 +106,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-gray-600">
+          {/* <div className="mt-6 pt-6 border-t border-gray-600">
             <p className="text-gray-300 text-sm text-center mb-3">
               Demo Accounts:
             </p>
@@ -118,7 +118,7 @@ export default function LoginPage() {
                 <strong>User 2:</strong> admin@example.com / admin123
               </div>
             </div>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
