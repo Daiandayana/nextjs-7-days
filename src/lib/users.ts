@@ -8,12 +8,12 @@ const USERS_COLLECTION = "users";
  */
 export async function findUserByEmail(email: string) {
   const { db } = await connectToDatabase();
-  const user = await db.collection(USERS_COLLECTION).findOne({ email });
+  const user: any = await db.collection(USERS_COLLECTION).findOne({ email });
   
   if (!user) return null;
   
   return {
-    _id: user._id?.toString() || '',
+    _id: String(user._id),
     email: user.email,
     password: user.password,
     name: user.name,
@@ -30,12 +30,12 @@ export async function findUserById(id: string) {
   
   try {
     const objectId = new ObjectId(id);
-    const user = await db.collection(USERS_COLLECTION).findOne({ _id: objectId });
+    const user: any = await db.collection(USERS_COLLECTION).findOne({ _id: objectId });
     
     if (!user) return null;
     
     return {
-      _id: user._id?.toString() || '',
+      _id: String(user._id),
       email: user.email,
       password: user.password,
       name: user.name,
@@ -50,11 +50,7 @@ export async function findUserById(id: string) {
 /**
  * Create a new user
  */
-export async function createUser(data: {
-  email: string;
-  password: string;
-  name: string;
-}) {
+export async function createUser(data: { email: string; password: string; name: string }) {
   const { db } = await connectToDatabase();
   
   const newUser = {
@@ -68,7 +64,7 @@ export async function createUser(data: {
   const result = await db.collection(USERS_COLLECTION).insertOne(newUser);
   
   return {
-    _id: result.insertedId.toString(),
+    _id: String(result.insertedId),
     email: data.email,
     password: data.password,
     name: data.name,
@@ -87,12 +83,7 @@ export async function updateUserPassword(id: string, newPassword: string): Promi
     const objectId = new ObjectId(id);
     const result = await db.collection(USERS_COLLECTION).updateOne(
       { _id: objectId },
-      { 
-        $set: { 
-          password: newPassword,
-          updatedAt: new Date() 
-        } 
-      }
+      { $set: { password: newPassword, updatedAt: new Date() } }
     );
     
     return result.modifiedCount > 0;
@@ -106,9 +97,7 @@ export async function updateUserPassword(id: string, newPassword: string): Promi
  */
 export async function seedDemoUsers(): Promise<number> {
   const existingUsers = await findUserByEmail("syah@example.com");
-  if (existingUsers) {
-    return 0;
-  }
+  if (existingUsers) return 0;
 
   const demoUsers = [
     { email: "syah@example.com", password: "123456", name: "Syah" },
