@@ -11,8 +11,7 @@ export default function LogoutButton() {
   return (
     <Button
       onClick={() => logout("/")}
-      variant="outline"
-      className="text-sm"
+      className="bg-white/10 hover:bg-white/20 text-white border border-white/30 backdrop-blur-sm"
     >
       Logout ({userName})
     </Button>
